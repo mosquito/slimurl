@@ -162,6 +162,15 @@ class URL(object):
 
         return hash(fields)
 
+    def __iter__(self):
+        return self.scheme, self.user, self.password,\
+               self.host, self.port, self.path, self.query, self.fragment
+
+    def __contains__(self, item):
+        for k, _ in self.query:
+            if k == item:
+                return True
+
     def __len__(self):
         return len(str(self))
 
