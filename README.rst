@@ -4,6 +4,20 @@ Slim URL
 .. image:: https://travis-ci.org/mosquito/slimurl.svg
     :target: https://travis-ci.org/mosquito/slimurl
 
+.. image:: https://img.shields.io/pypi/v/slimurl.svg
+    :target: https://pypi.python.org/pypi/slimurl/
+    :alt: Latest Version
+
+.. image:: https://img.shields.io/pypi/wheel/slimurl.svg
+    :target: https://pypi.python.org/pypi/slimurl/
+
+.. image:: https://img.shields.io/pypi/pyversions/slimurl.svg
+    :target: https://pypi.python.org/pypi/slimurl/
+
+.. image:: https://img.shields.io/pypi/l/slimurl.svg
+    :target: https://pypi.python.org/pypi/slimurl/
+
+
 Slim URL - is fast wrapper for construction or/and parse URL components. Parsing based on regular expressions.
 
 Example::
