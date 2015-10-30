@@ -137,6 +137,22 @@ EXAMPLES = {
             )
         )
     ),
+    (
+        'http://[::]:80/',
+        TestURL(
+            scheme='http', host='[::]', port=80, path='/',
+            user=None, password=None, fragment=None,
+            query=tuple()
+        )
+    ),
+    (
+        'http://user:pass@[::]:80/path/?url#sdfs',
+        TestURL(
+            scheme='http', host='[::]', port=80, path='/path/',
+            user='user', password='pass', fragment='sdfs',
+            query=tuple([('url', None)])
+        )
+    ),
 }
 
 NORM_MAP = {

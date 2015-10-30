@@ -20,7 +20,7 @@ class URL(object):
         '^(?P<scheme>[^\:]+):\/\/'
         '((((?P<user>[^:^@]+))?'
         '((\:(?P<password>[^@]+)?))?\@)?'
-        '(?P<host>[^\/^:]+)'
+        '(?P<host>([^\/^:]+|\[([^\/]+)\]))'
         '(\:(?P<port>\d+))?)?'
         '(((?P<path>\/[^\?]*)'
         '(\?(?P<query>[^\#]+)?)?'
@@ -157,7 +157,7 @@ class URL(object):
     def __hash__(self):
         fields = (
             self.scheme, self.user, self.password, self.host, self.port, self.path if self.path else '/',
-            tuple(sorted(self.query)), self.fragment
+            tuple(sorted((str(k), str(v)) for k, v in self.query)), self.fragment
         )
 
         return hash(fields)
