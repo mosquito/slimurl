@@ -1,6 +1,9 @@
 Slim URL
 ========
 
+.. image:: https://travis-ci.org/mosquito/slimurl.svg
+    :target: https://travis-ci.org/mosquito/slimurl
+
 Slim URL - is fast wrapper for construction or/and parse URL components. Parsing based on regular expressions.
 
 Example::
