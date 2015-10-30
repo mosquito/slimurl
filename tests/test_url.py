@@ -4,37 +4,37 @@ from collections import namedtuple
 
 from slimurl import URL
 
-TestURL = namedtuple("TestURL", 'scheme user password host path port query anchor')
+TestURL = namedtuple("TestURL", 'scheme user password host path port query fragment')
 
 EXAMPLES = {
     (
         'http://example.net',
         TestURL(
             scheme='http', host='example.net', port=80, path=None, query=tuple(),
-            user=None, password=None, anchor=None
+            user=None, password=None, fragment=None
         )
     ),
     (
         'http://example.net/',
         TestURL(
             scheme='http', host='example.net', port=80, path='/', query=tuple(),
-            user=None, password=None, anchor=None
+            user=None, password=None, fragment=None
         )
     ),
     (
         'http://example.net/foo_path',
         TestURL(scheme='http', host='example.net', port=80, path='/foo_path', query=tuple(),
-                user=None, password=None, anchor=None)
+                user=None, password=None, fragment=None)
     ),
     (
         'http://example.net/foo_path/',
         TestURL(scheme='http', host='example.net', port=80, path='/foo_path/', query=tuple(),
-                user=None, password=None, anchor=None)
+                user=None, password=None, fragment=None)
     ),
     (
         'http://example.net/?foo=bar',
         TestURL(scheme='http', host='example.net', port=80, path='/', query=tuple([('foo', 'bar'),]),
-                user=None, password=None, anchor=None)
+                user=None, password=None, fragment=None)
     ),
     (
         'http://example.net/?foo=bar&foo=baz',
@@ -42,14 +42,14 @@ EXAMPLES = {
             scheme='http', host='example.net', port=80, path='/',
             user=None, password=None,
             query=tuple([('foo', 'bar'), ('foo', 'baz')]),
-            anchor=None
+            fragment=None
         )
     ),
     (
         'http://example.net/?foo=bar&foo=baz&foo=foo&bar=1',
         TestURL(
             scheme='http', host='example.net', port=80, path='/',
-            user=None, password=None, anchor=None,
+            user=None, password=None, fragment=None,
             query=tuple([
                 ('foo', 'bar'),
                 ('foo', 'baz'),
@@ -62,7 +62,7 @@ EXAMPLES = {
         'http://example.net/?foo=bar&foo=baz&foo&bar',
         TestURL(
             scheme='http', host='example.net', port=80, path='/',
-            user=None, password=None, anchor=None,
+            user=None, password=None, fragment=None,
             query=tuple([
                 ('foo', 'bar'),
                 ('foo', 'baz'),
@@ -75,7 +75,7 @@ EXAMPLES = {
         'mysql://example.net/testdb/',
         TestURL(
             scheme='mysql', host='example.net', port=3306, path='/testdb/',
-            user=None, password=None, anchor=None,
+            user=None, password=None, fragment=None,
             query=tuple()
         )
     ),
@@ -83,7 +83,7 @@ EXAMPLES = {
         'http://test@example.net',
         TestURL(
             scheme='http', host='example.net', port=80, path=None,
-            user='test', password=None, anchor=None,
+            user='test', password=None, fragment=None,
             query=tuple()
         )
     ),
@@ -91,7 +91,7 @@ EXAMPLES = {
         'http://test:secret@example.net',
         TestURL(
             scheme='http', host='example.net', port=80, path=None,
-            user='test', password='secret', anchor=None,
+            user='test', password='secret', fragment=None,
             query=tuple()
         )
     ),
@@ -99,7 +99,7 @@ EXAMPLES = {
         'http://test:secret@example.net:8080',
         TestURL(
             scheme='http', host='example.net', port=8080, path=None,
-            user='test', password='secret', anchor=None,
+            user='test', password='secret', fragment=None,
             query=tuple()
         )
     ),
@@ -107,7 +107,7 @@ EXAMPLES = {
         'unix:///',
         TestURL(
             scheme='unix', host=None, port=None, path='/',
-            user=None, password=None, anchor=None,
+            user=None, password=None, fragment=None,
             query=tuple()
         )
     ),
@@ -115,7 +115,7 @@ EXAMPLES = {
         'unix://',
         TestURL(
             scheme='unix', host=None, port=None, path=None,
-            user=None, password=None, anchor=None,
+            user=None, password=None, fragment=None,
             query=tuple()
         )
     ),
@@ -123,7 +123,7 @@ EXAMPLES = {
         'unix:///var/run/program.sock',
         TestURL(
             scheme='unix', host=None, port=None, path='/var/run/program.sock',
-            user=None, password=None, anchor=None,
+            user=None, password=None, fragment=None,
             query=tuple()
         )
     ),
@@ -131,7 +131,7 @@ EXAMPLES = {
         'unix:///var/run/program.sock?foo=bar',
         TestURL(
             scheme='unix', host=None, port=None, path='/var/run/program.sock',
-            user=None, password=None, anchor=None,
+            user=None, password=None, fragment=None,
             query=tuple(
                 [('foo', 'bar')]
             )

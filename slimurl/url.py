@@ -3,7 +3,7 @@ import re
 import sys
 from copy import copy
 from functools import total_ordering
-
+from .protocols import DEFAULT_PORTS
 
 if sys.version_info < (3,):
     from urllib import quote, unquote
@@ -14,7 +14,7 @@ else:
 @total_ordering
 class URL(object):
 
-    __slots__ = {'scheme', 'user', 'password', 'host', 'path', 'port', 'query', 'anchor'}
+    __slots__ = {'scheme', 'user', 'password', 'host', 'path', 'port', 'query', 'fragment'}
 
     EXP = re.compile(
         '^(?P<scheme>[^\:]+):\/\/'
@@ -24,7 +24,7 @@ class URL(object):
         '(\:(?P<port>\d+))?)?'
         '(((?P<path>\/[^\?]*)'
         '(\?(?P<query>[^\#]+)?)?'
-        '(\#(?P<anchor>.*))?)?)?$'
+        '(\#(?P<fragment>.*))?)?)?$'
     )
 
     def _split_query(self, parts):
@@ -43,7 +43,7 @@ class URL(object):
         return {chk(query)}
 
     def _parse_port(self, parts):
-        port = parts['port'] or self.DEFAULT_PORTS.get(parts['scheme'])
+        port = parts['port'] or DEFAULT_PORTS.get(parts['scheme'])
         return int(port) if port else port
 
     _POST_PARSERS = {
@@ -108,7 +108,7 @@ class URL(object):
 
     @classmethod
     def _format_port(cls, port, scheme):
-        return '' if not port or port is cls.DEFAULT_PORTS.get(scheme) else ":{}".format(port)
+        return '' if not port or port is DEFAULT_PORTS.get(scheme) else ":{}".format(port)
 
     @classmethod
     def _format_path(cls, path):
@@ -157,7 +157,7 @@ class URL(object):
     def __hash__(self):
         fields = (
             self.scheme, self.user, self.password, self.host, self.port, self.path if self.path else '/',
-            tuple(sorted(self.query)), self.anchor
+            tuple(sorted(self.query)), self.fragment
         )
 
         return hash(fields)
