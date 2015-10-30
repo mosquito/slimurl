@@ -7,7 +7,7 @@ setup(
     name='slimurl',
     version=slimurl.__version__,
     author=slimurl.__author__,
-    author_email='me@mosquito.su',
+    author_email=slimurl.aurhor_info[1],
     license="MIT",
     description="SlimURL - Fast library for parsing and building URL addresses",
     platforms="all",
