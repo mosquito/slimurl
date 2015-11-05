@@ -67,10 +67,14 @@ class URL(object):
             setattr(self, key, post_parser(self, url_parts) if post_parser else value)
 
     def __setitem__(self, key, value):
-        return self.query.add((key, value))
+        if isinstance(value, (tuple, list)):
+            for item in value:
+                self.query.add((key, str(item)))
+        else:
+            self.query.add((key, str(value)))
 
     def __getitem__(self, item):
-        return list(filter(lambda x: x[0] == item, self.query))
+        return list(map(lambda x: x[1], filter(lambda x: x[0] == item, self.query)))
 
     @staticmethod
     def _to_string(item):
@@ -163,8 +167,14 @@ class URL(object):
         return hash(fields)
 
     def __iter__(self):
-        return self.scheme, self.user, self.password,\
-               self.host, self.port, self.path, self.query, self.fragment
+        yield self.scheme
+        yield self.user
+        yield self.password
+        yield self.host
+        yield self.port
+        yield self.path
+        yield self.query
+        yield self.fragment
 
     def __contains__(self, item):
         for k, _ in self.query:
@@ -188,3 +198,49 @@ class URL(object):
 
     def __gt__(self, other):
         return len(self) > len(other)
+
+    def __delitem__(self, key):
+        for item in list(sorted(self.query)):
+            k, v = item
+            if k == key:
+                self.query.remove(item)
+
+    def get(self, key, default=None, limit=1):
+        assert limit is None or limit > 0 or isinstance(limit, int), \
+            "limit might be None or positive integer"
+
+        result = list(
+            map(
+                lambda x: x[1],
+                filter(
+                    lambda x: x[0] == key,
+                    self.query
+                )
+            )
+        )
+
+        result = result if result else None
+
+        if result:
+            if limit is None:
+                return result
+            else:
+                return result[:limit] if limit > 1 else result[0]
+        else:
+            return default
+
+    def pop(self, key, default=None):
+        for item in list(sorted(self.query)):
+            k, v = item
+            if k == key:
+                self.query.remove(item)
+                return v
+
+        return default
+
+    def remove_all(self, key):
+        while key in self:
+            del self[key]
+
+    def remove(self, key):
+        self.pop(key)
