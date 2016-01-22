@@ -172,8 +172,8 @@ class URL(object):
         yield self.password
         yield self.host
         yield self.port
-        yield self.path
-        yield self.query
+        yield self.path or '/'
+        yield frozenset(self.query)
         yield self.fragment
 
     def __contains__(self, item):
@@ -191,16 +191,10 @@ class URL(object):
         return hash(self) == hash(other) and tuple(self) == tuple(other)
 
     def __lt__(self, other):
+        if not isinstance(other, URL):
+            other = URL(other)
+
         return len(self) < len(other)
-
-    def __le__(self, other):
-        return len(self) <= len(other)
-
-    def __ge__(self, other):
-        return len(self) >= len(other)
-
-    def __gt__(self, other):
-        return len(self) > len(other)
 
     def __delitem__(self, key):
         for item in list(sorted(self.query)):
