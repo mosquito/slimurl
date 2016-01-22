@@ -185,7 +185,10 @@ class URL(object):
         return len(str(self))
 
     def __eq__(self, other):
-        return hash(self) == hash(other)
+        if not isinstance(other, URL):
+            other = URL(other)
+
+        return hash(self) == hash(other) and tuple(self) == tuple(other)
 
     def __lt__(self, other):
         return len(self) < len(other)
