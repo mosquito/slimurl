@@ -55,6 +55,15 @@ class URL(object):
         if url is None:
             return
 
+        self.scheme = None
+        self.user = None
+        self.password = None
+        self.host = None
+        self.path = None
+        self.port = None
+        self.query = None
+        self.fragment = None
+
         m = self.EXP.match(str(url))
         if m is None:
             raise ValueError('URL "%r" is not valid' % url)
@@ -80,9 +89,23 @@ class URL(object):
     def __getitem__(self, item):
         return list(map(lambda x: x[1], filter(lambda x: x[0] == item, self.query)))
 
-    def path_append(*args):
-        path = self.path.split("/") if self.path else "/"
-        self.path = "/{0}".format("/".join())
+    def path_append(self, *args):
+        path = ''
+
+        args = [arg if arg not in ("", "/") else None for arg in args]
+        parts = (self.path or '/').split("/")[1:]
+
+        for subset in parts, args:
+            for part in subset:
+                if not path.endswith("/"):
+                    path += "/"
+
+                if part is None:
+                    continue
+
+                path += str(part)
+
+        self.path = path
 
     @staticmethod
     def _to_string(item):
