@@ -51,7 +51,7 @@ class URL(object):
         'query': _split_query,
     }
 
-    def __init__(self, url=None):
+    def __init__(self, url=None, **defaults):
         if url is None:
             return
 
@@ -66,6 +66,10 @@ class URL(object):
 
             setattr(self, key, post_parser(self, url_parts) if post_parser else value)
 
+        for key, value in defaults.items():
+            if not getattr(self, key, None):
+                setattr(self, key, value)
+
     def __setitem__(self, key, value):
         if isinstance(value, (tuple, list)):
             for item in value:
@@ -75,6 +79,10 @@ class URL(object):
 
     def __getitem__(self, item):
         return list(map(lambda x: x[1], filter(lambda x: x[0] == item, self.query)))
+
+    def path_append(*args):
+        path = self.path.split("/") is self.path else "/"
+        self.path = "/{0}".format("/".join())
 
     @staticmethod
     def _to_string(item):
@@ -137,7 +145,6 @@ class URL(object):
 
     def __call__(self, **kwargs):
         for key, value in kwargs.items():
-            assert key in self.__slots__, "Unknown attribute: %r" % key
             setattr(self, key, value)
         return self
 
