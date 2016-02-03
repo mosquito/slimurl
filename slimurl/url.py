@@ -81,7 +81,7 @@ class URL(object):
         return list(map(lambda x: x[1], filter(lambda x: x[0] == item, self.query)))
 
     def path_append(*args):
-        path = self.path.split("/") is self.path else "/"
+        path = self.path.split("/") if self.path else "/"
         self.path = "/{0}".format("/".join())
 
     @staticmethod
