@@ -52,9 +52,6 @@ class URL(object):
     }
 
     def __init__(self, url=None, **defaults):
-        if url is None:
-            return
-
         self.scheme = None
         self.user = None
         self.password = None
@@ -63,6 +60,9 @@ class URL(object):
         self.port = None
         self.query = None
         self.fragment = None
+
+        if not url:
+            return
 
         m = self.EXP.match(str(url))
         if m is None:
@@ -134,7 +134,7 @@ class URL(object):
 
     @classmethod
     def _format_scheme(cls, scheme):
-        return "{0}://".format(cls._to_string(scheme))
+        return "{0}://".format(cls._to_string(scheme)) if scheme else ''
 
     @classmethod
     def _format_credentials(cls, username=None, password=None):
@@ -157,7 +157,7 @@ class URL(object):
         return str(host) if host else ''
 
     def __str__(self):
-        return "".join((
+        url = "".join((
                 self._format_scheme(self.scheme),
                 self._format_credentials(self.user, self.password),
                 self._format_host(self.host),
@@ -165,6 +165,8 @@ class URL(object):
                 self._format_path(self.path),
                 self._format_query(self.query)
         ))
+
+        return '' if url == '/' else url
 
     def __call__(self, **kwargs):
         for key, value in kwargs.items():

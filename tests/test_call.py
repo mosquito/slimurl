@@ -16,3 +16,11 @@ def check_call(url):
 def test_call():
     for url_string, _ in EXAMPLES:
         yield check_call, URL(url_string)
+
+
+def test_init():
+    yield lambda: URL("http://localhost/") != URL(None)
+    yield lambda: URL("http://localhost/") != URL('')
+    yield lambda: URL("http://localhost/") != URL()
+    yield lambda: URL("http://localhost/") is not None
+    yield lambda: URL("http://localhost/") != ''
