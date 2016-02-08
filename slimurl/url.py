@@ -58,7 +58,7 @@ class URL(object):
         self.host = None
         self.path = None
         self.port = None
-        self.query = None
+        self.query = set([])
         self.fragment = None
 
         if not url:
