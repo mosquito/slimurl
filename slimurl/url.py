@@ -8,6 +8,7 @@ from .protocols import DEFAULT_PORTS
 if sys.version_info < (3,):
     from urllib import quote, unquote
 else:
+    from functools import reduce
     from urllib.parse import quote, unquote
 
 
@@ -89,11 +90,24 @@ class URL(object):
     def __getitem__(self, item):
         return list(map(lambda x: x[1], filter(lambda x: x[0] == item, self.query)))
 
-    def path_append(self, *args):
+    def path_append(self, *args, **kwargs):
         path = ''
+        escape = kwargs.get('escape', False)
 
-        args = [arg if arg not in ("", "/") else None for arg in args]
+        def arg_filter(result, item):
+            if item == '..' and not escape:
+                result[0] -= 1
+                return result
+
+            if item in ('', '/'):
+                result[1].append(None)
+
+            result[1].append(item)
+            return result
+
         parts = (self.path or '/').split("/")[1:]
+        shift, args = reduce(arg_filter, args, [len(parts), []])
+        parts = parts[:shift] if parts[-1] else parts[:shift - 1] + ['']
 
         for subset in parts, args:
             for part in subset:

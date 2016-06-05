@@ -23,6 +23,17 @@ def test_path_append():
         ["http://example.net/foo/", "http://example.net/foo/bar/", ['bar', '']],
         ["http://example.net/foo/", "http://example.net/foo/bar", ['bar']],
         ["http://example.net/foo/", "http://example.net/foo/", ['']],
+
+        ["http://example.net/foo/", "http://example.net/", ['..']],
+        ["http://example.net/foo", "http://example.net/", ['..']],
+        ["http://example.net/", "http://example.net/", ['..']],
+        ["http://example.net/", "http://example.net/", ['..', '..']],
+        ["http://example.net/", "http://example.net/", ['..', '..', '..']],
+        ["http://example.net/foo/bar/baz/", "http://example.net/", ['..', '..', '..']],
+        ["http://example.net/foo/bar/baz", "http://example.net/", ['..', '..', '..']],
+        ["http://example.net/foo/bar/baz/", "http://example.net/foo/", ['..', '..']],
+        ["http://example.net/foo/bar/baz", "http://example.net/foo", ['..', '..']],
+
         ["http://example.net/foo/", "http://example.net/foo/", []],
     ]
 
