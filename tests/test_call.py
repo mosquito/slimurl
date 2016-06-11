@@ -10,7 +10,7 @@ def check_call(url):
     url(path='test')
     clone.path = 'test'
 
-    assert clone == url
+    assert clone == url, "%r != %r" % (clone, url)
 
 
 def test_call():

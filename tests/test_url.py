@@ -4,7 +4,10 @@ from collections import namedtuple
 
 from slimurl import URL
 
-TestURL = namedtuple("TestURL", 'scheme user password host path port query fragment')
+TestURL = namedtuple(
+    "TestURL",
+    ('scheme', 'user', 'password', 'host', 'path', 'port', 'query', 'fragment')
+)
 
 EXAMPLES = {
     (

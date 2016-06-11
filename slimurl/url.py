@@ -1,8 +1,7 @@
 # encoding: utf-8
 import re
 import sys
-from copy import copy
-from functools import total_ordering
+from functools import wraps
 from .protocols import DEFAULT_PORTS
 
 if sys.version_info < (3,):
@@ -12,10 +11,15 @@ else:
     from urllib.parse import quote, unquote
 
 
-@total_ordering
-class URL(object):
+def _convert_compare(func):
+    @wraps(func)
+    def wrap(self, other):
+        return func(self, URL(other))
+    return wrap
 
-    __slots__ = {'scheme', 'user', 'password', 'host', 'path', 'port', 'query', 'fragment'}
+
+class URL(str):
+    _fields = frozenset({'scheme', 'user', 'password', 'host', 'path', 'port', 'query', 'fragment'})
 
     EXP = re.compile(
         '^(?P<scheme>[^\:]+):\/\/'
@@ -53,6 +57,7 @@ class URL(object):
     }
 
     def __init__(self, url=None, **defaults):
+        super(URL, self).__init__()
         self.scheme = None
         self.user = None
         self.password = None
@@ -183,34 +188,25 @@ class URL(object):
         return '' if url == '/' else url
 
     def __call__(self, **kwargs):
-        for key, value in kwargs.items():
+        for key, value in ((k, v) for k, v in kwargs.items() if k in self._fields):
             setattr(self, key, value)
+
         return self
 
     def __copy__(self):
-        url = URL()
-
-        for key in self.__slots__:
-            setattr(url, key, copy(getattr(self, key)))
-
-        return url
+        return URL(str(self))
 
     def __repr__(self):
         return '<URL: "%s">' % self
 
     def __setattr__(self, key, value):
-        if key not in self.__slots__:
+        if key not in self._fields:
             raise AttributeError('"{}" is not allowed'.format(key))
 
         return super(URL, self).__setattr__(key, value)
 
     def __hash__(self):
-        fields = (
-            self.scheme, self.user, self.password, self.host, self.port, self.path if self.path else '/',
-            tuple(sorted((str(k), str(v)) for k, v in self.query)), self.fragment
-        )
-
-        return hash(fields)
+        return hash(tuple(self))
 
     def __iter__(self):
         yield self.scheme
@@ -218,8 +214,8 @@ class URL(object):
         yield self.password
         yield self.host
         yield self.port
-        yield self.path or '/'
-        yield frozenset(self.query)
+        yield "/%s" % self.path.lstrip("/") if self.path else '/'
+        yield tuple(sorted((str(k), str(v)) for k, v in self.query))
         yield self.fragment
 
     def __contains__(self, item):
@@ -230,17 +226,25 @@ class URL(object):
     def __len__(self):
         return len(str(self))
 
+    @_convert_compare
     def __eq__(self, other):
-        if not isinstance(other, URL):
-            other = URL(other)
+        return tuple(self) == tuple(other)
 
-        return hash(self) == hash(other) and tuple(self) == tuple(other)
-
+    @_convert_compare
     def __lt__(self, other):
-        if not isinstance(other, URL):
-            other = URL(other)
+        return tuple(self) < tuple(other)
 
-        return len(self) < len(other)
+    @_convert_compare
+    def __gt__(self, other):
+        return tuple(self) > tuple(other)
+
+    @_convert_compare
+    def __ge__(self, other):
+        return tuple(self) >= tuple(other)
+
+    @_convert_compare
+    def __le__(self, other):
+        return tuple(self) <= tuple(other)
 
     def __delitem__(self, key):
         for item in list(sorted(self.query)):
