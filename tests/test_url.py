@@ -156,6 +156,22 @@ EXAMPLES = {
             query=tuple([('url', None)])
         )
     ),
+    (
+        'file:///C:\\test\\windows\\path',
+        TestURL(
+            scheme='file', host=None, port=None, path='/C:\\test\\windows\\path',
+            user=None, password=None, fragment=None,
+            query=tuple()
+        )
+    ),
+    (
+        'file:///C:/Documents%20and%20Settings/davris/FileSchemeURIs.doc',
+        TestURL(
+            scheme='file', host=None, port=None, path='/C:/Documents and Settings/davris/FileSchemeURIs.doc',
+            user=None, password=None, fragment=None,
+            query=tuple()
+        )
+    ),
 }
 
 NORM_MAP = {
@@ -169,10 +185,11 @@ def normalize(value):
 
 def check_url(url_string, url_test):
     url = URL(url_string)
+
     for attr in url_test._fields:
         url_attr = getattr(url, attr)
         test_value = normalize(getattr(url_test, attr))
-        assert url_attr == test_value, "({} != {})[{}] {} != {}".format(url, url_string, attr, url_attr, test_value)
+        assert url_attr == test_value, "({} != {}) [{}] {} != {}".format(url, url_string, attr, url_attr, test_value)
 
 
 def test_url():

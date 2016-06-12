@@ -92,7 +92,7 @@ class URL(str):
         if isinstance(item, bytes):
             item = item.decode('utf-8')
 
-        return quote(str(item))
+        return quote(str(item), safe="/\\:")
 
     @staticmethod
     def _from_string(item):
@@ -296,3 +296,7 @@ class URL(str):
 
     def remove(self, key):
         self.pop(key)
+
+    @property
+    def win_path(self):
+        return self.path.lstrip("/").replace("/", "\\").replace("|", ":")
