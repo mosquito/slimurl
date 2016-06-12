@@ -35,17 +35,17 @@ class URL(str):
     def _split_query(self, parts):
         query = parts['query']
 
-        def chk(prt):
-            t = prt.split("=", 1)
+        def check(part):
+            t = part.split("=", 1)
             len(t) < 2 and t.append(None)
             return tuple(t)
 
         if not query:
             return set([])
         if "&" in query:
-            return {chk(i) for i in query.split("&")}
+            return {check(i) for i in query.split("&")}
 
-        return {chk(query)}
+        return {check(query)}
 
     def _parse_port(self, parts):
         port = parts['port'] or DEFAULT_PORTS.get(parts['scheme'])
@@ -55,6 +55,59 @@ class URL(str):
         'port': _parse_port,
         'query': _split_query,
     }
+
+    @classmethod
+    def _format_scheme(cls, scheme):
+        return "{0}://".format(cls._to_string(scheme)) if scheme else ''
+
+    @classmethod
+    def _format_credentials(cls, username=None, password=None):
+        credentials = ":".join((cls._to_string(username), cls._to_string(password))).rstrip(':')
+        return "{0}@".format(credentials) if credentials else ''
+
+    @classmethod
+    def _format_port(cls, port, scheme):
+        return '' if not port or port is DEFAULT_PORTS.get(scheme) else ":{}".format(port)
+
+    @classmethod
+    def _format_path(cls, path):
+        if not path:
+            return '/'
+
+        return cls._to_string(('{0}' if path.startswith("/") else '/{0}').format(path))
+
+    @staticmethod
+    def _format_host(host):
+        return str(host) if host else ''
+
+    @staticmethod
+    def _format_fragment(fragment):
+        return "#%s" % fragment if fragment else ''
+
+    @staticmethod
+    def _to_string(item):
+        if not item:
+            return ''
+
+        if isinstance(item, bytes):
+            item = item.decode('utf-8')
+
+        return quote(str(item))
+
+    @staticmethod
+    def _from_string(item):
+        if not item:
+            return item
+
+        return unquote(item)
+
+    @classmethod
+    def _format_query(cls, query):
+        if not query:
+            return ''
+
+        params = ("=".join((cls._to_string(key), cls._to_string(value))) for key, value in query)
+        return "?{0}".format("&".join(params))
 
     def __init__(self, url=None, **defaults):
         super(URL, self).__init__()
@@ -126,55 +179,6 @@ class URL(str):
 
         self.path = path
 
-    @staticmethod
-    def _to_string(item):
-        if not item:
-            return ''
-
-        if isinstance(item, bytes):
-            item = item.decode('utf-8')
-
-        return quote(str(item))
-
-    @staticmethod
-    def _from_string(item):
-        if not item:
-            return item
-
-        return unquote(item)
-
-    @classmethod
-    def _format_query(cls, query):
-        if not query:
-            return ''
-
-        params = ("=".join((cls._to_string(key), cls._to_string(value))) for key, value in query)
-        return "?{0}".format("&".join(params))
-
-    @classmethod
-    def _format_scheme(cls, scheme):
-        return "{0}://".format(cls._to_string(scheme)) if scheme else ''
-
-    @classmethod
-    def _format_credentials(cls, username=None, password=None):
-        credentials = ":".join((cls._to_string(username), cls._to_string(password))).rstrip(':')
-        return "{0}@".format(credentials) if credentials else ''
-
-    @classmethod
-    def _format_port(cls, port, scheme):
-        return '' if not port or port is DEFAULT_PORTS.get(scheme) else ":{}".format(port)
-
-    @classmethod
-    def _format_path(cls, path):
-        if not path:
-            return '/'
-
-        return cls._to_string(('{0}' if path.startswith("/") else '/{0}').format(path))
-
-    @staticmethod
-    def _format_host(host):
-        return str(host) if host else ''
-
     def __str__(self):
         url = "".join((
                 self._format_scheme(self.scheme),
@@ -182,7 +186,8 @@ class URL(str):
                 self._format_host(self.host),
                 self._format_port(self.port, self.scheme),
                 self._format_path(self.path),
-                self._format_query(self.query)
+                self._format_query(self.query),
+                self._format_fragment(self.fragment)
         ))
 
         return '' if url == '/' else url
@@ -215,7 +220,7 @@ class URL(str):
         yield self.host
         yield self.port
         yield "/%s" % self.path.lstrip("/") if self.path else '/'
-        yield tuple(sorted((str(k), str(v)) for k, v in self.query))
+        yield tuple(sorted((str(k), str(v) if v is not None else '') for k, v in self.query))
         yield self.fragment
 
     def __contains__(self, item):

@@ -9,7 +9,7 @@ author_info = (
 
 author_email = ", ".join(map(lambda x: x[1], author_info))
 
-version_info = (0, 7, 0)
+version_info = (0, 7, 1)
 
 __version__ = ".".join(map(str, version_info))
 __author__ = ", ".join(map(lambda x: "%s <%s>" % x, author_info))
