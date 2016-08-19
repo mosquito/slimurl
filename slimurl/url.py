@@ -56,60 +56,55 @@ class URL(str):
         'query': _split_query,
     }
 
-    @classmethod
-    def _format_scheme(cls, scheme):
-        return "{0}://".format(cls._to_string(scheme)) if scheme else ''
+    def __format_scheme(self, scheme):
+        return "{0}://".format(self.__to_string(scheme)) if scheme else ''
 
-    @classmethod
-    def _format_credentials(cls, username=None, password=None):
-        credentials = ":".join((cls._to_string(username), cls._to_string(password))).rstrip(':')
+    def __format_credentials(cls, username=None, password=None):
+        credentials = ":".join((cls.__to_string(username), cls.__to_string(password))).rstrip(':')
         return "{0}@".format(credentials) if credentials else ''
 
-    @classmethod
-    def _format_port(cls, port, scheme):
+    @staticmethod
+    def __format_port(port, scheme):
         return '' if not port or port is DEFAULT_PORTS.get(scheme) else ":{}".format(port)
 
-    @classmethod
-    def _format_path(cls, path):
+    def __format_path(self, path):
         if not path:
             return '/'
 
-        return cls._to_string(('{0}' if path.startswith("/") else '/{0}').format(path))
+        return self.__to_string(('{0}' if path.startswith("/") else '/{0}').format(path))
 
     @staticmethod
-    def _format_host(host):
+    def __format_host(host):
         return str(host) if host else ''
 
     @staticmethod
-    def _format_fragment(fragment):
+    def __format_fragment(fragment):
         return "#%s" % fragment if fragment else ''
 
-    @staticmethod
-    def _to_string(item):
+    def __to_string(self, item):
         if not item:
             return ''
 
         if isinstance(item, bytes):
             item = item.decode('utf-8')
 
-        return quote(str(item), safe="/\\:")
+        return quote(str(item), safe=self.__safe_symbols)
 
     @staticmethod
-    def _from_string(item):
+    def __from_string(item):
         if not item:
             return item
 
         return unquote(item)
 
-    @classmethod
-    def _format_query(cls, query):
+    def __format_query(self, query):
         if not query:
             return ''
 
-        params = ("=".join((cls._to_string(key), cls._to_string(value))) for key, value in query)
+        params = ("=".join((self.__to_string(key), self.__to_string(value))) for key, value in query)
         return "?{0}".format("&".join(params))
 
-    def __init__(self, url=None, **defaults):
+    def __init__(self, url=None, safe_symbols="/\\:", **defaults):
         super(URL, self).__init__()
         self.scheme = None
         self.user = None
@@ -119,6 +114,7 @@ class URL(str):
         self.port = None
         self.query = set([])
         self.fragment = None
+        self.__safe_symbols = safe_symbols
 
         if not url:
             return
@@ -127,7 +123,7 @@ class URL(str):
         if m is None:
             raise ValueError('URL "%r" is not valid' % url)
 
-        url_parts = {key: self._from_string(value) for key, value in m.groupdict().items()}
+        url_parts = {key: self.__from_string(value) for key, value in m.groupdict().items()}
 
         for key, value in url_parts.items():
             post_parser = self._POST_PARSERS.get(key)
@@ -181,13 +177,13 @@ class URL(str):
 
     def __str__(self):
         url = "".join((
-                self._format_scheme(self.scheme),
-                self._format_credentials(self.user, self.password),
-                self._format_host(self.host),
-                self._format_port(self.port, self.scheme),
-                self._format_path(self.path),
-                self._format_query(self.query),
-                self._format_fragment(self.fragment)
+                self.__format_scheme(self.scheme),
+                self.__format_credentials(self.user, self.password),
+                self.__format_host(self.host),
+                self.__format_port(self.port, self.scheme),
+                self.__format_path(self.path),
+                self.__format_query(self.query),
+                self.__format_fragment(self.fragment)
         ))
 
         return '' if url == '/' else url
@@ -205,7 +201,7 @@ class URL(str):
         return '<URL: "%s">' % self
 
     def __setattr__(self, key, value):
-        if key not in self._fields:
+        if key not in self._fields and not key.startswith('_'):
             raise AttributeError('"{}" is not allowed'.format(key))
 
         return super(URL, self).__setattr__(key, value)
