@@ -8,6 +8,7 @@ setup(
     version=module.__version__,
     author=module.__author__,
     author_email=module.author_email,
+    url="https://github.com/mosquito/slimurl/",
     license="MIT",
     description="SlimURL - Fast library for parsing and building URL addresses",
     platforms="all",
