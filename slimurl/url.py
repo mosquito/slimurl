@@ -32,6 +32,8 @@ class URL(str):
         '(\#(?P<fragment>.*))?)?)?$'
     )
 
+    DEFAULT_SAFE_SYMBOLS = "/\\:"
+
     def _split_query(self, parts):
         query = parts['query']
 
@@ -88,7 +90,7 @@ class URL(str):
         if isinstance(item, bytes):
             item = item.decode('utf-8')
 
-        return quote(str(item), safe=self.__safe_symbols)
+        return quote(str(item), safe=self._safe_symbols)
 
     @staticmethod
     def __from_string(item):
@@ -104,8 +106,19 @@ class URL(str):
         params = ("=".join((self.__to_string(key), self.__to_string(value))) for key, value in query)
         return "?{0}".format("&".join(params))
 
-    def __init__(self, url=None, safe_symbols="/\\:", **defaults):
-        super(URL, self).__init__()
+    def __new__(cls, url=None, safe_symbols=DEFAULT_SAFE_SYMBOLS, **defaults):
+        return str.__new__(cls)
+
+    def __init__(self, url=None, safe_symbols=DEFAULT_SAFE_SYMBOLS, **defaults):
+        """
+        Create URL object
+
+        :type safe_symbols: iterable
+        :param url: URL address
+        :param safe_symbols: iterable object of symbols which not urlencoded
+        """
+
+        # super(URL, self).__init__()
         self.scheme = None
         self.user = None
         self.password = None
@@ -114,7 +127,7 @@ class URL(str):
         self.port = None
         self.query = set([])
         self.fragment = None
-        self.__safe_symbols = safe_symbols
+        self._safe_symbols = safe_symbols
 
         if not url:
             return
