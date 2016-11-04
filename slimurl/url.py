@@ -25,9 +25,9 @@ class URL(str):
         '^(?P<scheme>[^\:]+):\/\/'
         '((((?P<user>[^:^@]+))?'
         '((\:(?P<password>[^@]+)?))?\@)?'
-        '(?P<host>([^\/^:]+|\[([^\/]+)\]))'
+        '(?P<host>([^\/^:^\?]+|\[([^\/]+)\]))'
         '(\:(?P<port>\d+))?)?'
-        '(((?P<path>\/[^\?]*)'
+        '(((?P<path>\/[^\?]*)?'
         '(\?(?P<query>[^\#]+)?)?'
         '(\#(?P<fragment>.*))?)?)?$'
     )
@@ -118,7 +118,7 @@ class URL(str):
         :param safe_symbols: iterable object of symbols which not urlencoded
         """
 
-        # super(URL, self).__init__()
+        super(URL, self).__init__()
         self.scheme = None
         self.user = None
         self.password = None
@@ -146,6 +146,10 @@ class URL(str):
         for key, value in defaults.items():
             if not getattr(self, key, None):
                 setattr(self, key, value)
+
+    def __div__(self, other):
+        self.path_append(other)
+        return self.__copy__()
 
     def __setitem__(self, key, value):
         if isinstance(value, (tuple, list)):

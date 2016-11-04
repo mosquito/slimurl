@@ -75,6 +75,19 @@ EXAMPLES = {
         )
     ),
     (
+        'http://example.net?foo=bar&foo=baz&foo&bar',
+        TestURL(
+            scheme='http', host='example.net', port=80, path=None,
+            user=None, password=None, fragment=None,
+            query=tuple([
+                ('foo', 'bar'),
+                ('foo', 'baz'),
+                ('foo', None),
+                ('bar', None),
+            ])
+        )
+    ),
+    (
         'mysql://example.net/testdb/',
         TestURL(
             scheme='mysql', host='example.net', port=3306, path='/testdb/',
