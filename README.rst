@@ -1,5 +1,5 @@
-Slim URL
-========
+Slim URL [DEPRICATED]
+=====================
 
 .. image:: https://travis-ci.org/mosquito/slimurl.svg
     :target: https://travis-ci.org/mosquito/slimurl
@@ -16,6 +16,11 @@ Slim URL
 
 .. image:: https://img.shields.io/pypi/l/slimurl.svg
     :target: https://pypi.python.org/pypi/slimurl/
+
+
+This module is deprecated. Please use the `YARL`_ instead.
+
+.. _YARL: https://pypi.python.org/pypi/yarl
 
 
 Slim URL - is fast wrapper for construction or/and parse URL components. Parsing based on regular expressions.
